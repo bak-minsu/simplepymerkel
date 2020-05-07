@@ -1,2 +1,2 @@
 # simplepymerkle
-A college student's naive implementation of a Merkel Tree file verification scheme 
+A naive implementation of a Merkle Tree file verification scheme 
