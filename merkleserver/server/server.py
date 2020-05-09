@@ -58,7 +58,7 @@ class Server:
     @classmethod
     def send_message(cls, message, conn_object):
         print("[Server]: {0}".format(message))
-        conn_object.sendall(str.encode(message))
+        conn_object.sendall(message.encode("UTF-8"))
     
     @classmethod
     def receive_message(cls, conn_object):
@@ -68,6 +68,7 @@ class Server:
 
     @classmethod
     def download_file(cls, filename, size, conn_object):
+        cls.send_message("Ready to Download File: {0}".format(filename), conn_object)
         path = os.path.join(cls.file_dir, filename)
         print("Downloading File '{0}' of size {1}".format(filename, size))
         with open(path, 'wb') as received_file:
@@ -77,7 +78,34 @@ class Server:
                 total_bytes += len(data)
                 received_file.write(data)
         print("Downloaded File '{0}' of size {1}".format(filename, size))
-        
+    
+    @classmethod
+    def send_file(cls, basename, conn_object):
+        full_path = os.path.join(cls.file_dir, basename)
+        if os.path.exists(full_path):
+            size = os.path.getsize(full_path)
+            cls.send_message(str(size), conn_object)
+            cls.receive_message(conn_object)
+            print("Sending File: {0}".format(basename))
+            with open(full_path, 'rb') as file2send:
+                conn_object.sendfile(file2send, count=size)
+            print("Sent File: {0}".format(basename))
+            print("Sending Proof")
+            prooflist_str = str(cls.tree.get_proof(full_path))
+            cls.send_message(prooflist_str, conn_object)
+            print("Sent Proof")
+        else: cls.send_message("File does not exist", conn_object)
+
+    @classmethod
+    def send_files(cls, conn_object):
+        done = False
+        while not done:
+            basename = cls.receive_message(conn_object)
+            if basename != "No More Files":
+                cls.send_file(basename, conn_object)
+            else:
+                done = True
+
     @classmethod
     def receive_files(cls, conn_object):
         print("Set to receive files.")
@@ -86,7 +114,6 @@ class Server:
             message = cls.receive_message(conn_object)
             if message != "No More Files":
                 filename, size = message.split(":")
-                print("Receiving File '{0}' of size {1}".format(filename, size))
                 cls.download_file(filename, int(size), conn_object)
                 cls.tree.add(os.path.join(cls.file_dir, filename))
             else: receive_more = False
@@ -101,6 +128,20 @@ class Server:
             cls.cli(conn_object)
     
     @classmethod
+    def get_proof(cls, conn_object):
+        done = False
+        while not done:
+            filename = cls.receive_message(conn_object)
+            if filename == "Done with proofs":
+                done = True
+            else:
+                filepath = os.path.join(cls.file_dir, filename)
+                if os.path.exists(filepath):
+                    prooflist = cls.tree.get_proof(filepath)
+                    cls.send_message(str(prooflist), conn_object)
+                else: cls.send_message("File does not exist", conn_object)
+
+    @classmethod
     def cli(cls, conn_object):
         done = False
         while not done:
@@ -108,6 +149,12 @@ class Server:
             print("Recieved Command: {0}".format(command))
             if command == "sendfiles":
                 cls.receive_files(conn_object)
+            elif command == "sendallfiles":
+                cls.receive_files(conn_object)
+            elif command == "getproof":
+                cls.get_proof(conn_object)
+            elif command == "getfiles":
+                cls.send_files(conn_object)
             elif command == "exit":
                 done = True
 

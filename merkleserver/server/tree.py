@@ -12,11 +12,14 @@ class Node:
     def hex_to_str(self, hex):
         return binascii.hexlify(hex).decode("utf-8")
 
+    def get_value_in_str(self):
+        return self.hex_to_str(self.value)
+
     def tree_str(self, prefix, isLeft, final):
         if(self.right is not None):
             new_prefix = prefix + ("│        " if isLeft else "         ")
             self.right.tree_str(new_prefix, False, final)
-        value_str = self.hex_to_str(self.value)[:8] # Gets the first 8 characters
+        value_str = self.get_value_in_str()[:8] # Gets the first 8 characters
         final.append(prefix + ("└─────── " if isLeft else "┌─────── ") + value_str + "\n")
         if(self.left is not None):
             new_prefix = prefix + ("         " if isLeft else "│        ")
