@@ -10,12 +10,21 @@ class Server:
     @classmethod
     def setup(cls):
         cls.debug = True
-        cls.tree = MerkleTree()
+        cls.tree = None     # Is populated later
         cls.file_dir = os.path.join(os.path.expanduser("~"), "MerkleFileStorage")
         if not os.path.exists(cls.file_dir): os.mkdir(cls.file_dir)
+        else: cls.add_files_to_tree()
         cls.socket = socket.socket()
         cls.port = 55555
         if cls.debug: print("Setup Complete") 
+
+    @classmethod
+    def add_files_to_tree(cls):
+        files = []
+        for stored_file in os.listdir(cls.file_dir):
+            full_path = os.path.join(cls.file_dir, stored_file)
+            files.append(full_path)
+        cls.tree = MerkleTree(files)
 
     @classmethod
     def stop(cls):
@@ -73,6 +82,7 @@ class Server:
                 filename, size = message.split(":")
                 print("Receiving File '{0}' of size {1}".format(filename, size))
                 cls.download_file(filename, int(size), conn_object)
+                cls.tree.add(os.path.join(cls.file_dir, filename))
             else: receive_more = False
         print("Completed receiving Files.")
 
@@ -96,13 +106,14 @@ class Server:
                 done = True
 
     @classmethod
-    def print_tree(cls):
+    def save_tree(cls, filepath):
         if cls.tree is not None:
-            print(cls.tree)
+            with open(filepath, "w", encoding="utf-8") as tree_file:
+                tree_file.write(str(cls.tree))
 
 def __main__():
     Server.start_server()
-    Server.print_tree()
+    Server.save_tree("tree.txt")
 
 if __name__ == "__main__":
     __main__()

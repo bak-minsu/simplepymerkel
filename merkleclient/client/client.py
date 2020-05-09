@@ -13,8 +13,8 @@ class Client:
         self.debug = True
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.port = 55555
-        self.address = "192.168.0.100"
-        # self.address = "127.0.0.1"
+        # self.address = "192.168.0.100"
+        self.address = "127.0.0.1"
         if(self.debug): print("Setup complete.")
     
     def send_message(self, message):
