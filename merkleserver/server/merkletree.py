@@ -1,6 +1,5 @@
 from tree import Node
 import hashlib
-import secrets
 import binascii
 
 class MerkleTree:
@@ -11,7 +10,8 @@ class MerkleTree:
         self.output_bitsize = 512       # Output size of hash in bits
         self.references = {}            # Dictionary of file references
         self.max_size = 2               # Max number before restructuring
-        self.compute_tree(files)
+        self.tree_iteration = 0
+        self.init_tree(files)
     
     def __str__(self):
         if self.root is not None:
@@ -26,6 +26,7 @@ class MerkleTree:
         def call_function(self, *args, **kwargs):
             keys = list(self.references.keys())
             self.root = self.compute_tree_recursive(keys)
+            self.save_tree()
         return call_function
     
     def get_hash(self, file_path):
@@ -53,19 +54,19 @@ class MerkleTree:
 
     def compute_tree_recursive(self, reference_keys):
         length = len(reference_keys)
-        if(length == 0): # This branch should never be reached, unless we start out with zero files
-            return None
+        if(length == 0):
+            return 
+        elif(length == 1):
+            left = self.references[reference_keys[0]]
+            right = Node(left.value)                                # input takes bytes
+            digest = self.combine_hashes(left.value, right.value)
+            new_node = Node(value=digest, left=left, right=right)
+            return new_node
         elif(length == 2):
             left = self.references[reference_keys[0]]
             right = self.references[reference_keys[1]]
             digest = self.combine_hashes(left.value, right.value)
             new_node = Node(value=digest,left=left, right=right)
-            return new_node
-        elif(length == 1):
-            left = self.references[reference_keys[0]]
-            right = Node(secrets.token_bytes(self.output_bitsize//8))     # input takes bytes
-            digest = self.combine_hashes(left.value, right.value)
-            new_node = Node(value=digest, left=left, right=right)
             return new_node
         else:
             left = self.compute_tree_recursive(reference_keys[:length//2])
@@ -74,10 +75,14 @@ class MerkleTree:
             new_node = Node(value=digest, left=left, right=right)
             return new_node
 
-    def compute_tree(self, files):
-        self.generate_references(files)
-        keys = list(self.references.keys())
-        self.root = self.compute_tree_recursive(keys)
+    def init_tree(self, files):
+        if len(files) > 0:
+            self.generate_references(files)
+            keys = list(self.references.keys())
+            self.root = self.compute_tree_recursive(keys)
+            self.save_tree()
+        else:
+            return None
 
     @edit
     def add(self, file_path):
@@ -85,4 +90,10 @@ class MerkleTree:
         digest = get_hash(file_path)
         self.references[file_path] = Node(digest)
 
+    def save_tree(self):
+        if self.root is not None:
+            filename = "tree_{0}.txt".format(self.tree_iteration) 
+            with open(filename, "w", encoding="utf-8") as tree_file:
+                tree_file.write(str(self))
+            self.tree_iteration += 1
         

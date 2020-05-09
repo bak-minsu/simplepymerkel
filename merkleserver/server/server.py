@@ -23,7 +23,6 @@ class Server:
         cls.file_dir = os.path.join(os.path.expanduser("~"), "MerkleFileStorage")
         if not os.path.exists(cls.file_dir): os.mkdir(cls.file_dir)
         cls.generate_tree()
-        cls.save_tree()
 
     @classmethod
     def generate_tree(cls):
@@ -90,7 +89,6 @@ class Server:
                 print("Receiving File '{0}' of size {1}".format(filename, size))
                 cls.download_file(filename, int(size), conn_object)
                 cls.tree.add(os.path.join(cls.file_dir, filename))
-                cls.save_tree()
             else: receive_more = False
         print("Completed receiving Files.")
 
@@ -112,14 +110,6 @@ class Server:
                 cls.receive_files(conn_object)
             elif command == "exit":
                 done = True
-
-    @classmethod
-    def save_tree(cls):
-        if cls.tree is not None:
-            filename = "tree_{0}.txt".format(cls.tree_iteration) 
-            with open(filename, "w", encoding="utf-8") as tree_file:
-                tree_file.write(str(cls.tree))
-            cls.tree_iteration += 1
 
 def __main__():
     Server.start_server()
