@@ -62,7 +62,6 @@ class Server:
                 total_bytes += len(data)
                 received_file.write(data)
         print("Downloaded File '{0}' of size {1}".format(filename, size))
-        input("waiting")
         
     @classmethod
     def receive_files(cls, conn_object):
