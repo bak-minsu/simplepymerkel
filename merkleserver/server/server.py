@@ -69,7 +69,7 @@ class Server:
             message = cls.receive_message(conn_object)
             if message != "No More Files":
                 filename, size = message.split(":")
-                print("Received File '{0}' of size {1}".format(filename, size))
+                print("Receiving File '{0}' of size {1}".format(filename, size))
                 cls.download_file(filename, int(size), conn_object)
             else: receive_more = False
         print("Completed receiving Files.")

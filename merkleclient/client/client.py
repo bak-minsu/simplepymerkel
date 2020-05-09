@@ -19,7 +19,7 @@ class Client:
     
     def send_message(self, message):
         print("[Client]: {0}".format(message))
-        self.socket.sendall(str.encode(message))
+        self.socket.sendall(message.encode("UTF-8"))
     
     def receive_message(self):
         message = self.socket.recv(1024).decode("utf-8")
@@ -31,9 +31,6 @@ class Client:
         with open(filepath, 'rb') as file2send:
             size = self.socket.sendfile(file2send)
             print(size)
-            # while data := file2send.read(1024):
-            #     self.socket.sendall(data)
-            # self.socket.sendall(b"Badly Implemented End of File Message")
         print("Uploaded File: {}".format(basename))
 
     def get_filepath(self):
@@ -47,13 +44,13 @@ class Client:
                 print("Sending File '{0}' of size {1}".format(basename, size))
                 self.send_message("{0}:{1}".format(basename, size))
                 done = True
+                return path
             elif path == "":
-                path = None
                 self.send_message("No More Files")
                 done = True
+                return
             else:
                 print("Path does not exist!")
-        return path
 
     def send_files(self):
         done = False
