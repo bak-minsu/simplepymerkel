@@ -59,8 +59,8 @@ class Server:
             data = conn_object.recv(size)
             received_file.write(data)
         print("Downloaded File: {0}".format(filename))
+        input("waiting")
         
-
     @classmethod
     def receive_files(cls, conn_object):
         print("Set to receive files.")

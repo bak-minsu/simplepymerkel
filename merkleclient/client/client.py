@@ -13,8 +13,8 @@ class Client:
         self.debug = True
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.port = 55555
-        # self.address = "192.168.0.100"
-        self.address = "127.0.0.1"
+        self.address = "192.168.0.100"
+        # self.address = "127.0.0.1"
         if(self.debug): print("Setup complete.")
     
     def send_message(self, message):
@@ -27,10 +27,10 @@ class Client:
     
     def upload_file(self, filepath):
         basename = os.path.basename(filepath)
+        size = os.path.getsize(path)
         print("Uploading File: {}".format(basename))
         with open(filepath, 'rb') as file2send:
-            size = self.socket.sendfile(file2send)
-            print(size)
+            self.socket.sendfile(file2send)
         print("Uploaded File: {}".format(basename))
 
     def get_filepath(self):
