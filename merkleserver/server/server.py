@@ -54,11 +54,11 @@ class Server:
     @classmethod
     def download_file(cls, filename, size, conn_object):
         path = os.path.join(cls.file_dir, filename)
-        print("Downloading File: {0}".format(filename))
+        print("Downloading File '{0}' of size {1}".format(filename, size))
         with open(path, 'wb') as received_file:
             data = conn_object.recv(size)
             received_file.write(data)
-        print("Downloaded File: {0}".format(filename))
+        print("Downloaded File '{0}' of size {1}".format(filename, size))
         input("waiting")
         
     @classmethod

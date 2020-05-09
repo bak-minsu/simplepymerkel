@@ -27,10 +27,10 @@ class Client:
     
     def upload_file(self, filepath):
         basename = os.path.basename(filepath)
-        size = os.path.getsize(path)
+        size = os.path.getsize(filepath)
         print("Uploading File: {}".format(basename))
         with open(filepath, 'rb') as file2send:
-            self.socket.sendfile(file2send)
+            self.socket.sendfile(file2send, count=size)
         print("Uploaded File: {}".format(basename))
 
     def get_filepath(self):
