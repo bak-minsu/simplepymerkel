@@ -7,6 +7,7 @@ class Client:
     def __init__(self):
         self.setup()
         self.run()
+        self.file_dir = os.path.join(os.path.expanduser("~"), "ClientFiles")
         self.stop()
 
     def setup(self):

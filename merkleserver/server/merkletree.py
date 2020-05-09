@@ -14,19 +14,18 @@ class MerkleTree:
         self.compute_tree(files)
     
     def __str__(self):
-        return self.root.__str__()
-
-    def recompute():
-        print("Recomputing!")
+        if self.root is not None:
+            return self.root.__str__()
+        else: return "No Files in Directory"
 
     def edit(self):
         """
         This decorator marks that the function edits the tree.
         It recomputes the tree if necessary.
         """
-        def call_function(*args, **kwargs):
-            if len(reference_list) > self.max_size:
-                recompute()
+        def call_function(self, *args, **kwargs):
+            keys = list(self.references.keys())
+            self.root = self.compute_tree_recursive(keys)
         return call_function
     
     def get_hash(self, file_path):
@@ -55,7 +54,7 @@ class MerkleTree:
     def compute_tree_recursive(self, reference_keys):
         length = len(reference_keys)
         if(length == 0): # This branch should never be reached, unless we start out with zero files
-            return Node(None)
+            return None
         elif(length == 2):
             left = self.references[reference_keys[0]]
             right = self.references[reference_keys[1]]
@@ -83,8 +82,7 @@ class MerkleTree:
     @edit
     def add(self, file_path):
         """Adds a file to the tree"""
-        hash = get_hash(file_path)
-        print(hash)
-        self.hash_list.append(hash)
+        digest = get_hash(file_path)
+        self.references[file_path] = Node(digest)
 
         
