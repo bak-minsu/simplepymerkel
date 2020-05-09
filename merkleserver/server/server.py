@@ -56,8 +56,11 @@ class Server:
         path = os.path.join(cls.file_dir, filename)
         print("Downloading File '{0}' of size {1}".format(filename, size))
         with open(path, 'wb') as received_file:
-            data = conn_object.recv(size+200)
-            received_file.write(data)
+            total_bytes = 0
+            while total_bytes < size:
+                data = conn_object.recv(size)
+                total_bytes += len(data)
+                received_file.write(data)
         print("Downloaded File '{0}' of size {1}".format(filename, size))
         input("waiting")
         
