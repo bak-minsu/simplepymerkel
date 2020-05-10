@@ -2,6 +2,7 @@ from tree import Node
 import hashlib
 import math
 import binascii
+import os
 
 class MerkleTree:
     """Implementation of the Merkle Tree"""
@@ -77,7 +78,6 @@ class MerkleTree:
                 new_node = Node(self.get_default_hash())
                 nodes.append(new_node)
         tree = self.compute_tree_recursive(nodes)
-        print("Digest of all files: {0}".format(tree.value))
         return tree
 
     def init_tree(self, files):
@@ -111,6 +111,7 @@ class MerkleTree:
 
     def save_tree(self):
         if self.root is not None:
+            if not os.path.exists("./trees"): os.mkdir("./trees")
             filename = "./trees/tree_{0}.txt".format(self.tree_iteration) 
             with open(filename, "w", encoding="utf-8") as tree_file:
                 tree_file.write(str(self))
