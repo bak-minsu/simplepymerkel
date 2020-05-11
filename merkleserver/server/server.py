@@ -91,6 +91,7 @@ class Server:
             with open(full_path, 'rb') as file2send:
                 conn_object.sendfile(file2send, count=size)
             print("Sent File: {0}".format(basename))
+            cls.receive_message(conn_object)
             print("Sending Proof")
             prooflist_str = str(cls.tree.get_proof(full_path))
             cls.send_message(prooflist_str, conn_object)

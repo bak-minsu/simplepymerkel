@@ -82,6 +82,7 @@ class Client:
                 total_bytes += len(data)
                 received_file.write(data)
         print("Downloaded File '{0}' of size {1}".format(filename, size))
+        self.send_message("Completed Download!")
         print("Receiving Proof")
         prooflist = self.process_prooflist_str(self.receive_message())
         print("Received Proof")
