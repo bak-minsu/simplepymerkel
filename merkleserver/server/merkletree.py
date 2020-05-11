@@ -91,7 +91,7 @@ class MerkleTree:
             return None
 
     def refresh_proofs(self):
-        self.root = self.compute_tree(list(self.references.values()))
+        self.root = self.compute_tree(list(self.references.keys()))
 
     def add(self, file_path):
         """Adds a file to the tree"""
