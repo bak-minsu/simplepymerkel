@@ -65,7 +65,7 @@ class MerkleTree:
         hasher.update(b"Default Value")
         return hasher.digest()
 
-    def compute_tree(self):
+    def compute_tree(self, files):
         self.references = self.generate_references(files)
         nodes = list(self.references.values())
         ref_len = len(nodes)
@@ -85,13 +85,13 @@ class MerkleTree:
 
     def init_tree(self, files):
         if len(files) > 0:
-            self.root = self.compute_tree()
+            self.root = self.compute_tree(files)
             self.save_tree()
         else:
             return None
 
     def refresh_proofs(self):
-        self.root = self.compute_tree()
+        self.root = self.compute_tree(list(self.references.values()))
 
     def add(self, file_path):
         """Adds a file to the tree"""
