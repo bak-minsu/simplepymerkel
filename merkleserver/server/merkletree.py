@@ -102,7 +102,7 @@ class MerkleTree:
 
     def get_proof(self, file_path):
         """Returns proof for given file_path"""
-        self.refresh_proofs()
+        # self.refresh_proofs()
         prooflist = []
         current_node = self.references[file_path]
         while current_node.parent is not None:
