@@ -18,8 +18,8 @@ class Client:
         self.port = 55555
         self.file_dir = os.path.join(os.path.expanduser("~"), "ClientFiles")
         self.download_dir = os.path.join(os.path.expanduser("~"), "ClientDownload")
-        self.digest = self.create_digest(self.get_all_files())
-        print("Digest of all files: {0}".format(self.hex_to_str(self.digest)))
+        self.hashes = {}
+        self.digest = None
         # self.address = "192.168.0.100"
         # self.address = "127.0.0.1"
         self.address = "178.128.134.85"
@@ -35,6 +35,7 @@ class Client:
         return message
     
     def upload_file(self, filepath):
+        self.hashes[filepath] = self.get_hash(filepath)
         basename = os.path.basename(filepath)
         size = os.path.getsize(filepath)
         print("Sending File '{0}' of size {1}".format(basename, size))
@@ -45,6 +46,7 @@ class Client:
             self.socket.sendfile(file2send, count=size)
         self.receive_message()
         print("Uploaded File: {}".format(basename))
+        self.update_digest()
 
     def get_filepath(self):
         done = False
@@ -70,6 +72,7 @@ class Client:
                 self.upload_file(full_path)
             else:
                 done = True
+                print("Digest of all files: {0}".format(self.hex_to_str(self.digest)))
 
     def receive_file(self, filename, size):
         self.send_message("Ready to Download File '{0}' of size {1}".format(filename, size))
@@ -125,16 +128,16 @@ class Client:
         hasher.update(right)
         return hasher.digest()
 
-    def create_digest_recursive(self, files):
-        length = len(files)
+    def update_digest_recursive(self, hashes):
+        length = len(hashes)
         if length == 2:
-            left = self.get_hash(files[0])
-            right = self.get_hash(files[1])
+            left = hashes[0]
+            right = hashes[1]
             digest = self.combine_hashes(left, right)
             return digest
         else:
-            left = self.create_digest_recursive(files[:length//2])
-            right = self.create_digest_recursive(files[length//2:])
+            left = self.update_digest_recursive(hashes[:length//2])
+            right = self.update_digest_recursive(hashes[length//2:])
             digest = self.combine_hashes(left, right)
             return digest
 
@@ -143,19 +146,19 @@ class Client:
         hasher.update(b"Default Value")
         return hasher.digest()
 
-    def create_digest(self, files):
-        files_len = len(files)
-        if files_len == 0:
+    def update_digest(self):
+        hashes_len = len(self.hashes)
+        hash_list = list(self.hashes.values())
+        if hashes_len == 0:
             return None
-        elif files_len == 1:
-            files.append(self.get_default_hash())
-        elif not math.log2(files_len).is_integer() :
+        elif hashes_len == 1:
+            hash_list.append(self.get_default_hash())
+        elif not math.log2(hashes_len).is_integer() :
             # Add default leaves
-            closest_power_of_2 = math.ceil(math.log2(files_len))
-            diff = int(math.pow(2, closest_power_of_2)) - files_len
-            for _ in range(diff):
-                files.append(self.get_default_hash())
-        return self.create_digest_recursive(files)
+            closest_power_of_2 = math.ceil(math.log2(hashes_len))
+            diff = int(math.pow(2, closest_power_of_2)) - hashes_len
+            for _ in range(diff): hash_list.append(self.get_default_hash())
+        self.digest = self.update_digest_recursive(hash_list)
 
     def get_all_files(self):
         files = []
@@ -169,6 +172,7 @@ class Client:
         for stored_file in files:
             self.upload_file(stored_file)
         self.send_message("No More Files")
+        print("Digest of all files: {0}".format(self.hex_to_str(self.digest)))
 
     def proof_is_correct(self, file_path, prooflist):
         cur_hash = self.get_hash(file_path)
