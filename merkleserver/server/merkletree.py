@@ -97,7 +97,6 @@ class MerkleTree:
         """Adds a file to the tree"""
         digest = self.get_hash(file_path)
         self.references[file_path] = Node(digest)
-        keys = list(self.references.keys())
         self.refresh_proofs()
         self.save_tree()
 
