@@ -181,6 +181,7 @@ class Client:
             print("Combine {0} and {1} to create {2}".format(self.short_hex(cur_hash), self.short_hex(proof), self.short_hex(new_hash)))
             cur_hash = new_hash
         print("Final Proof Digest: {0}".format(self.short_hex(cur_hash)))
+        print("Our Proof: {0}".format(self.short_hex(self.digest)))
         return cur_hash == self.digest
         
     def str_to_hex(self, string):
