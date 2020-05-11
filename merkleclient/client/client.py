@@ -50,7 +50,8 @@ class Client:
         done = False
         path = None
         while not done:
-            path = input("Input an empty message to exit.\n[Enter File Path]: ").strip()
+            path = input("Input an empty message to exit.\n[File Name]: ").strip()
+            full_path = os.path.join(self.file_dir, path)
             if os.path.exists(path):
                 done = True
                 return path
@@ -64,9 +65,9 @@ class Client:
     def send_files(self):
         done = False
         while not done:
-            path = self.get_filepath()
-            if path is not None:
-                self.upload_file(path)
+            full_path = self.get_filepath()
+            if full_path is not None:
+                self.upload_file(full_path)
             else:
                 done = True
 
