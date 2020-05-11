@@ -52,9 +52,9 @@ class Client:
         while not done:
             path = input("Input an empty message to exit.\n[File Name]: ").strip()
             full_path = os.path.join(self.file_dir, path)
-            if os.path.exists(path):
+            if os.path.exists(full_path):
                 done = True
-                return path
+                return full_path
             elif path == "":
                 self.send_message("No More Files")
                 done = True
