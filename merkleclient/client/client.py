@@ -19,7 +19,7 @@ class Client:
         self.file_dir = os.path.join(os.path.expanduser("~"), "ClientFiles")
         self.download_dir = os.path.join(os.path.expanduser("~"), "ClientDownload")
         self.digest = self.create_digest(self.get_all_files())
-        print("Digest of all files: {0}".format(self.digest))
+        print("Digest of all files: {0}".format(self.hex_to_str(self.digest)))
         # self.address = "192.168.0.100"
         # self.address = "127.0.0.1"
         self.address = "178.128.134.85"
