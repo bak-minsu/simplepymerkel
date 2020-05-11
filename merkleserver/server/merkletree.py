@@ -89,16 +89,20 @@ class MerkleTree:
         else:
             return None
 
+    def refresh_proofs(self):
+        self.root = self.compute_tree()
+
     def add(self, file_path):
         """Adds a file to the tree"""
         digest = self.get_hash(file_path)
         self.references[file_path] = Node(digest)
         keys = list(self.references.keys())
-        self.root = self.compute_tree()
+        self.refresh_proofs()
         self.save_tree()
 
     def get_proof(self, file_path):
         """Returns proof for given file_path"""
+        self.refresh_proofs()
         prooflist = []
         current_node = self.references[file_path]
         while current_node.parent is not None:

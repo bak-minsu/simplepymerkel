@@ -77,6 +77,7 @@ class Server:
                 data = conn_object.recv(size)
                 total_bytes += len(data)
                 received_file.write(data)
+        cls.send_message("Received File: {0}".format(filename), conn_object)
         print("Downloaded File '{0}' of size {1}".format(filename, size))
     
     @classmethod

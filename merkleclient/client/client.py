@@ -21,7 +21,8 @@ class Client:
         self.digest = self.create_digest(self.get_all_files())
         print("Digest of all files: {0}".format(self.digest))
         # self.address = "192.168.0.100"
-        self.address = "127.0.0.1"
+        # self.address = "127.0.0.1"
+        self.address = "178.128.134.85"
         if(self.debug): print("Setup complete.")
 
     def send_message(self, message):
@@ -42,6 +43,7 @@ class Client:
         print("Uploading File: {}".format(basename))
         with open(filepath, 'rb') as file2send:
             self.socket.sendfile(file2send, count=size)
+        self.receive_message()
         print("Uploaded File: {}".format(basename))
 
     def get_filepath(self):
@@ -85,7 +87,7 @@ class Client:
         print("Verifying Proof")
         is_verified = self.proof_is_correct(file_path, prooflist)
         if is_verified: print("Proof Verified!")
-        else: print("Proof Invalid. File has been tampered.")
+        else: print("Proof Invalid. Files have been tampered.")
     
     def get_files(self):
         done = False
