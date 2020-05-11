@@ -39,9 +39,11 @@ class MerkleTree:
         return hasher.digest()
 
     def generate_references(self, files):
+        references = {}
         for file_path in files:
             digest = self.get_hash(file_path)
-            self.references[file_path] = Node(digest)
+            references[file_path] = Node(digest)
+        return references
 
     def compute_tree_recursive(self, nodes):
         length = len(nodes)
@@ -64,6 +66,7 @@ class MerkleTree:
         return hasher.digest()
 
     def compute_tree(self):
+        self.references = self.generate_references(files)
         nodes = list(self.references.values())
         ref_len = len(nodes)
         if ref_len == 0:
@@ -82,8 +85,6 @@ class MerkleTree:
 
     def init_tree(self, files):
         if len(files) > 0:
-            self.generate_references(files)
-            keys = list(self.references.keys())
             self.root = self.compute_tree()
             self.save_tree()
         else:
